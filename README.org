@@ -1,0 +1,219 @@
+#+title:     Rust Language
+#+author:    Manmohan Krishna
+#+email:     krishna.m.zyw@gmail.com
+
+* Rust
+** commands
+*** rustc
+1. rustc --version
+    To check rust version
+2. rustc file.rs
+    Compile file.rs
+*** rustup
+1. rustup update
+    Update rust
+2. rustup self uninstall
+    Uninstalls rust
+*** cargo
+1. cargo --version
+    Compile file.rs
+2. cargo new <your project>
+    To create a new project using cargo
+3. cargo build
+    Updates registry of crates available
+    Creates `target/debug/<your project name>` executable
+4. cargo run
+    To run the generated binary executable
+5. cargo check
+    To check if the code compiles but doesn't produce an executable
+6. cargo build --release
+    To compile with optimizations
+    Creates an executable in `target/release` instead of `target/debug`
+7. cargo update
+    Updates `creates.io` index and updates the dependencies that fit `Cargo.toml` following SemVer(Semantic Versioning).
+8. cargo doc --open 
+    Will build documentation provided by all your dependencies locally and open it in your browser
+** general info
+- `println!`, because it has an ! is a macro. If it did not, it would have been a function.
+- Cargo - Rust's build system and package manager
+- Convention is to name project with snake_case not camelCase.
+- Because the default build is a debug build, Cargo puts the binary in a directory named "debug".
+** the language
+- std::io for input/output
+- standard library items brought into the scope of every program called `prelude`
+- to bring a `type` into scope explicitly, eg, 
+  #+begin_src 
+  use std::io;
+  #+end_src
+- `let` statement to create a variable; mut to make it mutable(immutable by default)
+  #+begin_src rust
+  let mut guess = String::new();
+  let apples = 5;
+  #+end_src
+- Calling `String::new` returns a new instances of a `String`, which is a string type provided by the standard library that is `growable`.
+- "::" syntax in "::new" indices that new is an associated function of the `String` type.
+- An "associated function" is a function that's implemented on a type(like extension methods in Scala).
+- The stdin function returns an instance of std::io::Stdin, which is a type that represents a handle to the standard input for your terminal.
+- The & indicates that this argument is a reference, which gives you a way to let multiple parts of your code access one piece of data without needing to copy that data into memory multiple times.
+- Like variables, "references" are immutable by default.
+- `read_line` returns a `Result` value, which is an Enumeration(or Enum), which can have one of a set of possible states.
+- Each possible state of an Enum is called a `variant`.
+- Result’s variants are Ok and Err(Like Try, Success and Failure in Scala).
+- Calling expect on a Result type - Returns the contained [`Ok`] value, consuming the `self` value. (Use is discouraged)
+- A `Crate` is a collection of Rust source code files.
+  Any project that we build is a binary crate, which is an executable.
+- Dependencies' latest versions are fetched from the registry, which is a copy of data from [[https://www.crates.io]]
+- Cargo.lock File - Ensures Reproducible builds
+  Often checked into source control with the rest of the code in the project.
+- The `Rng` trait defines methods that random number generators implement, and this trait must be in scope for us to use those methods.
+- A pattern match is made up of "arms". An arm consists of a pattern to match against.
+- Unless otherwise specified, Rust defaults to an i32
+- Shadowing lets us reuse a variable name rather than forcing us to create two unique variables. 
+  This feature is often used when you want to convert a value from one type to another type.
+- There is a difference between immutables variables and `const`s.
+  Constants are always immutable. You declare constants using the `const` keyword.
+  The type must also be annotated for a `const`.
+  Constants can be declared in global scope.
+  Constants can be set only to a constant expression, not the result of a value that
+  could only be computed at runtime.
+  #+begin_src rust
+  const THREE_HOURS_IN_SECONDS: u32 = 60 * 60 * 3;
+  #+end_src
+- When trying to use "Shadowing" to reassign a variable, you need to use the `let` keyword.
+- Shadowing is different from marking a variable as mut because we’ll get a compile-time error if we accidentally try to reassign to this variable without using the let keyword. By using let, we can perform a few transformations on a value but have the variable be immutable after those transformations have been completed.
+  The other difference between mut and shadowing is that because we’re effectively creating a new variable when we use the let keyword again, we can change the type of the value but reuse the same name. For example, say our program asks a user to show how many spaces they want between some text by inputting space characters, and then we want to store that input as a number:
+  #+begin_src rust
+  let spaces = "   ";
+  let spaces = spaces.len();
+  #+end_src
+** Data Types
+1. Scalar
+- Integer
+  | Length  | Signed | Unsigned |
+  |---------+--------+----------|
+  | 8-bit   | i8     | u8       |
+  | 16-bit  | i16    | u16      |
+  | 32-bit  | i32    | u32      |
+  | 64-bit  | i64    | u64      |
+  | 128-bit | i128   | u128     |
+  | arch    | isize  | usize    |
+- Floats
+  f32 and f64(default)
+- Booleans(bool)
+  `true` and `false`
+- Characters(char)
+  Four bytes in size and represents a Unicode Scalar Value
+2. Compound
+- Tuple
+  Typles without any values has a special name, `unit`.
+  #+begin_src rust
+  let tup = (500, 6.4, 1);
+
+  // Destructuring(using Pattern matching)
+  let (x, y, z) = tup;
+
+  // Old Scala-like syntax where the index is present inside parentheses.
+  let five_hundred = x.0;
+  let six_point_four = x.1;
+  let one = x.2;
+  #+end_src
+- Array
+  Arrays in Rust have a fixed length. 
+  Even if you access an invalid index from an array, you will not get an invalid memory access.
+  You will get an error like this -
+  `
+  thread 'main' panicked at 'index out of bounds: the len is 5 but the index is 17', src/main.rs:19:19
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+  `
+  #+begin_src rust
+  fn main() {
+      let a = [1, 2, 3, 4, 5];
+      let b: [i32; 5] = [1, 2, 3, 4, 5];
+      let a = [3; 5]; // Unlike in Scala, where we would do: Array.fill(5)(3)
+      let first = a[0];
+      let second = a[1];
+  }
+  #+end_src
+- Vector
+  Can grow or shrink in size, unlike Array.
+** Functions
+*** Statements and Expressions
+Statements are instructions that perform some action and do not return a value.
+Expressions evaluate to a resultant value.
+*** Functions with return values
+- `->` is used to give the return type for a function.
+- You can return early with a `return` keyword.
+- Most functions return the last expression implicitly.
+** Control Flow
+*** `if` Expressions
+#+begin_src rust
+fn main() {
+    let number = 6;
+
+    if number % 4 == 0 {
+        println!("number is divisible by 4");
+    } else if number % 3 == 0 {
+        println!("number is divisible by 3");
+    } else if number % 2 == 0 {
+        println!("number is divisible by 2");
+    } else {
+        println!("number is not divisible by 4, 3, or 2");
+    }
+}
+#+end_src
+Unlike languages such as Ruby and JavaScript, Rust will not automatically try to convert non-Boolean types to a Boolean.
+*** Repetition with Loops
+There are three kinds of loops in Rust.
+1. `loop`
+    - use `break` to come out of loop
+    - use `continue` to skip the rest of the current iteration
+    #+begin_src rust
+    fn main() {
+        let mut counter = 0;
+
+        let result = loop {
+            counter += 1;
+
+            if counter == 10 {
+                break counter * 2;
+            }
+        };
+
+        println!("The result is {result}");
+    }
+    #+end_src
+    - Loop labels to disambiguate between multiple loops
+      #+begin_src rust
+      fn main() {
+          let mut count = 0;
+          'counting_up: loop {
+              println!("count = {count}");
+              let mut remaining = 10;
+
+              loop {
+                  println!("remaining = {remaining}");
+                  if remaining == 9 {
+                      break;
+                  }
+                  if count == 2 {
+                      break 'counting_up;
+                  }
+                  remaining -= 1;
+              }
+
+              count += 1;
+          }
+          println!("End count = {count}");
+      }
+      #+end_src
+2. `while`
+3. `for`
+#+begin_src rust
+fn main() {
+    let a = [10, 20, 30, 40, 50];
+
+    for element in a {
+        println!("the value is: {element}");
+    }
+}
+#+end_src
