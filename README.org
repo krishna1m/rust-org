@@ -341,3 +341,103 @@ Because s is created inside dangle, when the code of dangle is finished, s will 
 Let’s recap what we’ve discussed about references:
 1. At any given time, you can have either one mutable reference or any number of immutable references.
 2. References must always be valid.
+*** The Slice Type
+Slices let you reference a contiguous sequence of elements in a collection rather than the whole collection. A slice is a kind of reference, so it does not have ownership.
+Defining a function to take a string slice instead of a reference to a String makes our API more general and useful without losing any functionality.
+String literals are string slices, ie,
+#+begin_src rust
+let s = "hello world";
+#+end_src
+
+A more general form is:
+#+begin_src rust
+fn first_word(s: &str) -> &str {
+#+end_src
+than
+#+begin_src rust
+fn first_word(s: &String) -> &str {
+#+end_src
+
+The above one is going to work with both, a `String` since we can pass a slice of it
+and a string slice(string literal).
+**** Other Slices
+#+begin_src rust
+let a = [1, 2, 3, 4, 5];
+
+let slice: &[i32] = &a[1..3];
+
+assert_eq!(slice, &[2, 3]);
+#+end_src
+It works the same way as string slices do, by storing a reference to the first element and a length.
+** Structs
+A struct, or structure, is a custom data type that lets you package together and name multiple related values that make up a meaningful group.
+*** Creating Structs
+#+begin_src rust
+struct User {
+    active: bool,
+    username: String,
+    email: String,
+    sign_in_count: u64,
+}
+#+end_src
+*** Creating instances from other instances with Struct Update Syntax
+#+begin_src rust
+fn main() {
+    // --snip--
+
+    let user2 = User {
+        email: String::from("another@example.com"),
+        ..user1
+    };
+}
+#+end_src
+In this example, we can no longer use user1 as a whole after creating user2 because the String in the username field of user1 was moved into user2. If we had given user2 new String values for both email and username, and thus only used the active and sign_in_count values from user1, then user1 would still be valid after creating user2. Both active and sign_in_count are types that implement the Copy trait.
+*** Using Tuple Structs Without Named Fields to Create Different Types
+#+begin_src rust
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+fn main() {
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+}
+#+end_src
+You can use a . followed by the index to access an individual value.
+*** Unit-Like Structs Without Any Fields
+You can also define structs that don’t have any fields! These are called unit-like structs because they behave similarly to ()
+#+begin_src rust
+struct AlwaysEqual;
+
+fn main() {
+    let subject = AlwaysEqual;
+}
+#+end_src
+*** Ownership of Struct Data
+In the User struct definition for User, we used the owned String type rather than the &str string slice type. This is a deliberate choice because we want each instance of this struct to own all of its data and for that data to be valid for as long as the entire struct is valid.
+Lifetimes ensure that the data referenced by a struct is valid for as long as the struct is.
+*** Adding Useful functionality with Derived Traits
+#+begin_src rust
+#[derive(Debug)]
+struct Rectangle {    
+    width: u32,
+    height: u32
+}
+fn main() {
+    let rect: Rectangle = Rectangle {
+        width: 30,
+        height: 50,
+    };
+    println!(
+        "The area of the rectangle {:?} is {} square pixels.",
+        rect,
+        area(&rect)
+    );
+}
+
+fn area(rectangle: &Rectangle) -> u32 {
+    rectangle.width * rectangle.height
+}
+#+end_src
+You can use {:#?} for Structs with more fields.
+*** dbg macro
+Another way to print out a value using the Debug format is to use the dbg! macro, which takes ownership of an expression (as opposed to println!, which takes a reference), prints the file and line number of where that dbg! macro call occurs in your code along with the resultant value of that expression, and returns ownership of the value.
