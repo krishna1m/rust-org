@@ -441,3 +441,42 @@ fn area(rectangle: &Rectangle) -> u32 {
 You can use {:#?} for Structs with more fields.
 *** dbg macro
 Another way to print out a value using the Debug format is to use the dbg! macro, which takes ownership of an expression (as opposed to println!, which takes a reference), prints the file and line number of where that dbg! macro call occurs in your code along with the resultant value of that expression, and returns ownership of the value.
+*** Method Syntax
+Methods are similar to functions: we declare them with the fn keyword and a name, they can have parameters and a return value, and they contain some code that’s run when the method is called from somewhere else.
+Their first parameter is always self, which represents the instance of the struct the method is being called on.
+**** Impl Keyword
+To define a function within the context of a certain struct, we start an `impl` block with the same
+name as the struct.
+In the signature of a method, we use `&self` which is short for `self: &Self` if we want to borrow `self` immutably.
+Methods can take ownership of `self`, borrow `self` immutably by using `&self` or borrow `self` mutably by using `&mut self`instead in a method.
+
+When we give a method the same name as a field of a struct, using parentheses after the method lets Rust know that it is indeed a method.
+
+One design pattern is to make struct fields private and use a method to get the value of the field by using an immutable reference, ie, `&self`.
+This ensures only read-only access to the field.
+
+See: Automatic Referencing and Dereferencing in Rust
+**** Associated Functions
+All functions defined within an `impl` block are called `associated functions`.
+Associated functions that do not have `self` as their first parameter are not methods.
+`String::from` is one such associated function. 
+
+One design pattern is to use Associated functions as constructors that will return
+a new instance of the struct.
+#+begin_src rust
+impl Rectangle {
+    fn square(size: u32) -> Self {
+        Self {
+            width: size,
+            height: size,
+        }
+    }
+}
+#+end_src
+In the example above, `Self`is an alias for the type that comes after the impl keyword.
+To call this associated function, the `::` syntax is used, eg,
+#+begin_src rust
+let sq = Rectangle::square(3);
+#+end_src
+**** Multiple impl blocks
+Useful when using generic types and traits.
