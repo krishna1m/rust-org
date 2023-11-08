@@ -18,20 +18,22 @@
 1. cargo --version
     Compile file.rs
 2. cargo new <your project>
-    To create a new project using cargo
-3. cargo build
+    To create a new project using cargo. Use option --lib to create a library.
+3. cargo init .
+    To create a new project in the current working directory. Use option --lib to create a library.
+4. cargo build
     Updates registry of crates available
     Creates `target/debug/<your project name>` executable
-4. cargo run
+5. cargo run
     To run the generated binary executable
-5. cargo check
+6. cargo check
     To check if the code compiles but doesn't produce an executable
-6. cargo build --release
+7. cargo build --release
     To compile with optimizations
     Creates an executable in `target/release` instead of `target/debug`
-7. cargo update
+8. cargo update
     Updates `creates.io` index and updates the dependencies that fit `Cargo.toml` following SemVer(Semantic Versioning).
-8. cargo doc --open 
+9. cargo doc --open 
     Will build documentation provided by all your dependencies locally and open it in your browser
 ** general info
 - `println!`, because it has an ! is a macro. If it did not, it would have been a function.
